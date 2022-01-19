@@ -27,3 +27,10 @@ $router->get('/', function () use ($router) {
 
 $router->get('/user/{id}', 'UserController@getUser');
 $router->get('/user', 'UserController@consultaUsuario');
+$router->post('/user', 'UserController@registroCliente');
+
+$router->get('/wallet', 'WalletController@consultarSaldo');
+$router->put('/wallet', 'WalletController@recargarSaldo');
+
+$router->post('/payment', 'PaymentController@pagar');
+$router->put('/payment', 'PaymentController@confirmarPago');

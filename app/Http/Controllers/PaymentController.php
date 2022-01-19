@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
-use App\Validator\UserValidator;
+use App\Validator\PaymentValidator;
 
 
-class UserController extends Controller
+class PaymentController extends Controller
 {
 
     private $url_api;
@@ -18,7 +18,7 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function __construct(UserValidator $validate)
+    public function __construct(PaymentValidator $validate)
     {
         $this->url_api = env('APP_API');
         $this->validate = $validate;
@@ -29,37 +29,9 @@ class UserController extends Controller
         return json_decode(json_encode(simplexml_load_string($xml->body())));
     }
 
-    public function getUser($id){
-        $response = Http::get($this->url_api.'/user/'.$id);
-        $response = $this->xmlToJson($response);
-        return response()->json($response);
-    }
-
-    public function consultaUsuario(Request $request)
+    public function pagar(Request $request)
     {
-
-        $validator = $this->validate->validateConsultaUsuario();
-        if ($validator->fails()) {
-            $response = [
-                "success"       => false,
-                "cod_error"      => 422,
-                "message_error" => $validator->errors()
-            ];
-            return response()->json($response);
-        }
-
-        $response = Http::get($this->url_api.'/user', [
-            'document' => $request->document,
-            'phone' => $request->phone
-        ]);
-        $response = $this->xmlToJson($response);
-        return response()->json($response);
-    }
-
-    public function registroCliente(Request $request)
-    {
-
-        $validator = $this->validate->validateRegistroCliente();
+        $validator = $this->validate->validatePagar();
         if ($validator->fails()) {
             $response = response([
                 "success"       => false,
@@ -69,11 +41,31 @@ class UserController extends Controller
             return response()->json($response);
         }
 
-        $response = Http::post($this->url_api.'/user', [
-            'name'=>$request->name,
-            'document' => $request->document,
-            'phone' => $request->phone,
-            'email' => $request->email
+        $response = Http::post($this->url_api.'/payment', [
+            "phone"            => $request->phone,
+            "document"         => $request->document,
+            "value"            => $request->value,
+            "id_user_payments" => $request->id_user_payments
+        ]);
+        // dd($response);
+        $response = $this->xmlToJson($response);
+        return response()->json($response);
+    }
+
+    public function confirmarPago(Request $request)
+    {
+        $validator = $this->validate->validateConfirmarPago();
+        if ($validator->fails()) {
+            $response = response([
+                "success"       => false,
+                "cod_error"      => 422,
+                "message_error" => $validator->errors()
+            ]);
+            return response()->json($response);
+        }
+
+        $response = Http::put($this->url_api.'/payment', [
+            "code"            => $request->code
         ]);
         $response = $this->xmlToJson($response);
         return response()->json($response);
