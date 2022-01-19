@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
-use App\Validator\UserValidator;
+use App\Validator\WalletValidator;
 
 
-class UserController extends Controller
+class WalletController extends Controller
 {
 
     private $url_api;
@@ -18,7 +18,7 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function __construct(UserValidator $validate)
+    public function __construct(WalletValidator $validate)
     {
         $this->url_api = env('APP_API');
         $this->validate = $validate;
@@ -29,37 +29,9 @@ class UserController extends Controller
         return json_decode(json_encode(simplexml_load_string($xml->body())));
     }
 
-    public function getUser($id){
-        $response = Http::get($this->url_api.'/user/'.$id);
-        $response = $this->xmlToJson($response);
-        return response()->json($response);
-    }
-
-    public function consultaUsuario(Request $request)
+    public function consultarSaldo(Request $request)
     {
-
-        $validator = $this->validate->validateConsultaUsuario();
-        if ($validator->fails()) {
-            $response = [
-                "success"       => false,
-                "cod_error"      => 422,
-                "message_error" => $validator->errors()
-            ];
-            return response()->json($response);
-        }
-
-        $response = Http::get($this->url_api.'/user', [
-            'document' => $request->document,
-            'phone' => $request->phone
-        ]);
-        $response = $this->xmlToJson($response);
-        return response()->json($response);
-    }
-
-    public function registroCliente(Request $request)
-    {
-
-        $validator = $this->validate->validateRegistroCliente();
+        $validator = $this->validate->validateConsultarSaldo();
         if ($validator->fails()) {
             $response = response([
                 "success"       => false,
@@ -69,13 +41,33 @@ class UserController extends Controller
             return response()->json($response);
         }
 
-        $response = Http::post($this->url_api.'/user', [
-            'name'=>$request->name,
+        $response = Http::get($this->url_api.'/wallet', [
             'document' => $request->document,
-            'phone' => $request->phone,
-            'email' => $request->email
+            'phone' => $request->phone
         ]);
         $response = $this->xmlToJson($response);
         return response()->json($response);
     }
+
+    public function recargarSaldo(Request $request)
+    {
+        $validator = $this->validate->validateRecargarBilletera();
+        if ($validator->fails()) {
+            $response = [
+                "success"       => false,
+                "cod_error"      => 422,
+                "message_error" => $validator->errors()
+            ];
+            return response()->json($response);
+        }
+
+        $response = Http::put($this->url_api.'/wallet', [
+            'document' => $request->document,
+            'phone'    => $request->phone,
+            'value'    => $request->value
+        ]);
+        $response = $this->xmlToJson($response);
+        return response()->json($response);
+    }
+
 }
