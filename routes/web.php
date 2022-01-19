@@ -16,3 +16,14 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+// $router->get('/user', [UserController::class, 'getUser']);
+// $router->get('/user',  ['user' => 'UserController@getUser']);
+
+// $app->group(['prefix' => 'api/v1','namespace' => 'App\Http\Controllers'], function($app)
+// {
+//   $app->get('/user','UserController@getUser');
+// });
+
+$router->get('/user/{id}', 'UserController@getUser');
+$router->get('/user', 'UserController@consultaUsuario');

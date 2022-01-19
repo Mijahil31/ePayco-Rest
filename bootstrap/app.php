@@ -112,4 +112,10 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+// Dotenv::load(__DIR__.'/../');
+
+$app->withFacades();
+
+$app->withEloquent();
+
 return $app;
