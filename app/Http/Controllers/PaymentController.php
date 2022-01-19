@@ -45,6 +45,7 @@ class PaymentController extends Controller
             "phone"            => $request->phone,
             "document"         => $request->document,
             "value"            => $request->value,
+            "description"      => $request->description,
             "id_user_payments" => $request->id_user_payments
         ]);
         // dd($response);
